@@ -1,9 +1,9 @@
 """Activity aggregation engine for combining data from multiple repositories."""
 
 from collections import defaultdict
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from typing import Callable, Optional
 
 from giteagle.core.models import Activity, ActivityType, Contributor, Repository
 
@@ -17,7 +17,7 @@ class AggregationResult:
     by_repository: dict[str, int] = field(default_factory=dict)
     by_contributor: dict[str, int] = field(default_factory=dict)
     by_type: dict[ActivityType, int] = field(default_factory=dict)
-    date_range: tuple[Optional[datetime], Optional[datetime]] = (None, None)
+    date_range: tuple[datetime | None, datetime | None] = (None, None)
 
 
 @dataclass
@@ -28,8 +28,8 @@ class ContributorStats:
     total_activities: int = 0
     by_type: dict[ActivityType, int] = field(default_factory=dict)
     by_repository: dict[str, int] = field(default_factory=dict)
-    first_activity: Optional[datetime] = None
-    last_activity: Optional[datetime] = None
+    first_activity: datetime | None = None
+    last_activity: datetime | None = None
 
 
 @dataclass
@@ -40,8 +40,8 @@ class RepositoryStats:
     total_activities: int = 0
     by_type: dict[ActivityType, int] = field(default_factory=dict)
     contributors: set[str] = field(default_factory=set)
-    first_activity: Optional[datetime] = None
-    last_activity: Optional[datetime] = None
+    first_activity: datetime | None = None
+    last_activity: datetime | None = None
 
 
 class ActivityAggregator:
@@ -66,12 +66,12 @@ class ActivityAggregator:
     def filter(
         self,
         *,
-        repositories: Optional[list[Repository]] = None,
-        contributors: Optional[list[str]] = None,
-        activity_types: Optional[list[ActivityType]] = None,
-        since: Optional[datetime] = None,
-        until: Optional[datetime] = None,
-        predicate: Optional[Callable[[Activity], bool]] = None,
+        repositories: list[Repository] | None = None,
+        contributors: list[str] | None = None,
+        activity_types: list[ActivityType] | None = None,
+        since: datetime | None = None,
+        until: datetime | None = None,
+        predicate: Callable[[Activity], bool] | None = None,
     ) -> list[Activity]:
         """Filter activities based on criteria."""
         result = self._activities
@@ -102,11 +102,11 @@ class ActivityAggregator:
     def aggregate(
         self,
         *,
-        repositories: Optional[list[Repository]] = None,
-        contributors: Optional[list[str]] = None,
-        activity_types: Optional[list[ActivityType]] = None,
-        since: Optional[datetime] = None,
-        until: Optional[datetime] = None,
+        repositories: list[Repository] | None = None,
+        contributors: list[str] | None = None,
+        activity_types: list[ActivityType] | None = None,
+        since: datetime | None = None,
+        until: datetime | None = None,
     ) -> AggregationResult:
         """Aggregate activities and compute statistics."""
         filtered = self.filter(
@@ -126,8 +126,8 @@ class ActivityAggregator:
         by_contrib: dict[str, int] = defaultdict(int)
         by_type: dict[ActivityType, int] = defaultdict(int)
 
-        min_date: Optional[datetime] = None
-        max_date: Optional[datetime] = None
+        min_date: datetime | None = None
+        max_date: datetime | None = None
 
         for activity in filtered:
             by_repo[activity.repository.full_name] += 1
@@ -146,7 +146,7 @@ class ActivityAggregator:
 
         return result
 
-    def get_contributor_stats(self, username: str) -> Optional[ContributorStats]:
+    def get_contributor_stats(self, username: str) -> ContributorStats | None:
         """Get statistics for a specific contributor."""
         user_activities = [a for a in self._activities if a.contributor.username == username]
 
@@ -169,7 +169,7 @@ class ActivityAggregator:
 
         return stats
 
-    def get_repository_stats(self, repository: Repository) -> Optional[RepositoryStats]:
+    def get_repository_stats(self, repository: Repository) -> RepositoryStats | None:
         """Get statistics for a specific repository."""
         repo_activities = [
             a for a in self._activities if a.repository.full_name == repository.full_name
@@ -196,8 +196,8 @@ class ActivityAggregator:
         self,
         *,
         granularity: str = "day",
-        since: Optional[datetime] = None,
-        until: Optional[datetime] = None,
+        since: datetime | None = None,
+        until: datetime | None = None,
     ) -> dict[str, int]:
         """Get activity counts grouped by time period."""
         filtered = self.filter(since=since, until=until)

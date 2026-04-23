@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from rich import box
 from rich.console import Console
@@ -46,7 +46,7 @@ class PullRequestInfo:
 
 def age_display(created_at: datetime, *, now: datetime | None = None) -> str:
     """Format age as human-readable string like '3d', '2h', '5w'."""
-    now = now or datetime.now(tz=timezone.utc)
+    now = now or datetime.now(tz=UTC)
     delta = now - created_at
     total_hours = int(delta.total_seconds() / 3600)
 
@@ -160,7 +160,7 @@ def render_prs(
     # Sort oldest first
     pr_infos.sort(key=lambda p: p.created_at)
 
-    now = datetime.now(tz=timezone.utc)
+    now = datetime.now(tz=UTC)
     stale_cutoff = now - timedelta(days=stale_days)
 
     table = Table(title=f"Open Pull Requests ({len(pr_infos)})", box=box.ROUNDED)

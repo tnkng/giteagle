@@ -3,7 +3,7 @@
 import os
 import stat
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 from urllib.parse import urlparse
 
 import yaml
@@ -13,12 +13,12 @@ from pydantic import BaseModel, ConfigDict, Field, SecretStr, field_validator
 class PlatformConfig(BaseModel):
     """Configuration for a single platform."""
 
-    token: Optional[SecretStr] = Field(default=None, description="API token")
-    base_url: Optional[str] = Field(default=None, description="Base API URL (for enterprise)")
+    token: SecretStr | None = Field(default=None, description="API token")
+    base_url: str | None = Field(default=None, description="Base API URL (for enterprise)")
 
     @field_validator("base_url")
     @classmethod
-    def validate_base_url(cls, v: Optional[str]) -> Optional[str]:
+    def validate_base_url(cls, v: str | None) -> str | None:
         """Ensure base_url uses HTTPS to prevent credential leakage."""
         if v is None:
             return v
@@ -64,7 +64,7 @@ def get_config_path() -> Path:
     return xdg_path
 
 
-def load_config(path: Optional[Path] = None) -> GiteagleConfig:
+def load_config(path: Path | None = None) -> GiteagleConfig:
     """Load configuration from file and environment variables."""
     config_path = path or get_config_path()
     config_data: dict[str, Any] = {}
@@ -93,7 +93,7 @@ def load_config(path: Optional[Path] = None) -> GiteagleConfig:
     return GiteagleConfig(**config_data)
 
 
-def save_config(config: GiteagleConfig, path: Optional[Path] = None) -> None:
+def save_config(config: GiteagleConfig, path: Path | None = None) -> None:
     """Save configuration to file."""
     config_path = path or get_config_path()
 

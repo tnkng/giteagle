@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from rich.console import Console
 
@@ -41,7 +41,7 @@ def compute_standup_since(days: int, *, now: datetime | None = None) -> datetime
     If days == 1 and today is Monday, look back to Friday (3 days).
     Otherwise, look back `days` calendar days.
     """
-    now = now or datetime.now(tz=timezone.utc)
+    now = now or datetime.now(tz=UTC)
     if days == 1 and now.weekday() == 0:  # Monday
         delta = timedelta(days=3)
     else:
@@ -56,7 +56,7 @@ def _parse_iso_datetime(value: str | None) -> datetime | None:
         return None
     try:
         return datetime.fromisoformat(value.replace("Z", "+00:00"))
-    except (ValueError, AttributeError):
+    except ValueError, AttributeError:
         return None
 
 
