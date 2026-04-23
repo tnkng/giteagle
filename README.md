@@ -3,7 +3,7 @@
 **Get a bird's eye view of your repositories.**
 
 [![Tests](https://github.com/pletisan/giteagle/actions/workflows/test.yml/badge.svg)](https://github.com/pletisan/giteagle/actions/workflows/test.yml)
-[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Giteagle helps engineering teams track activities across multiple repositories. When your project spans dozens of repos with contributions from multiple teams, staying on top of what's happening becomes challenging. Giteagle aggregates commits, pull requests, and issues into a unified view.
@@ -307,7 +307,7 @@ giteagle stats mycompany/api mycompany/web --days 30
 
 ### Prerequisites
 
-- Python 3.9+
+- Python 3.10+
 - [uv](https://github.com/astral-sh/uv) (recommended) or pip
 
 ### Setup

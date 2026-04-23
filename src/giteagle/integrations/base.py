@@ -2,7 +2,6 @@
 
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import Optional
 
 from giteagle.core.models import Activity, Repository
 
@@ -24,8 +23,8 @@ class PlatformClient(ABC):
     @abstractmethod
     async def list_repositories(
         self,
-        owner: Optional[str] = None,
-        org: Optional[str] = None,
+        owner: str | None = None,
+        org: str | None = None,
     ) -> list[Repository]:
         """List repositories for a user or organization."""
         pass
@@ -34,8 +33,8 @@ class PlatformClient(ABC):
     async def get_activities(
         self,
         repository: Repository,
-        since: Optional[datetime] = None,
-        until: Optional[datetime] = None,
+        since: datetime | None = None,
+        until: datetime | None = None,
         limit: int = 100,
     ) -> list[Activity]:
         """Fetch activities for a repository."""

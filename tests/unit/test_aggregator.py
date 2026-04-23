@@ -244,7 +244,7 @@ class TestActivityAggregator:
 
         # Add varying activities to each repo
         counts = [5, 3, 8]
-        for repo, count in zip(multiple_repos, counts):
+        for repo, count in zip(multiple_repos, counts, strict=True):
             for i in range(count):
                 aggregator.add_activities(
                     [

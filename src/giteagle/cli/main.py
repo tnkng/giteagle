@@ -488,7 +488,7 @@ def prs(ctx: click.Context, repos: tuple, author: str | None, stale: int) -> Non
                     status_results = await asyncio.gather(*status_tasks, return_exceptions=True)
 
                     reviews_map: dict[int, list] = {}
-                    for pr, result in zip(raw_prs, reviews_results):
+                    for pr, result in zip(raw_prs, reviews_results, strict=True):
                         if isinstance(result, list):
                             reviews_map[pr["number"]] = result
                         else:
@@ -496,7 +496,7 @@ def prs(ctx: click.Context, repos: tuple, author: str | None, stale: int) -> Non
 
                     status_map: dict[str, dict] = {}
                     prs_with_sha = [pr for pr in raw_prs if pr.get("head", {}).get("sha")]
-                    for pr, status_result in zip(prs_with_sha, status_results):
+                    for pr, status_result in zip(prs_with_sha, status_results, strict=True):
                         sha = pr["head"]["sha"]
                         if isinstance(status_result, dict):
                             status_map[sha] = status_result
@@ -587,7 +587,7 @@ def stats(ctx: click.Context, repos: tuple, days: int) -> None:
                     review_results = await asyncio.gather(*review_tasks, return_exceptions=True)
 
                     reviews_map: dict[int, list] = {}
-                    for pr, result in zip(all_merged, review_results):
+                    for pr, result in zip(all_merged, review_results, strict=True):
                         if isinstance(result, list):
                             reviews_map[pr["number"]] = result
                         else:

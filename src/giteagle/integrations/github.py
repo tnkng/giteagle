@@ -4,7 +4,7 @@ import asyncio
 import logging
 import re
 from datetime import datetime, timezone
-from typing import Any, Optional
+from typing import Any
 
 import httpx
 
@@ -26,7 +26,7 @@ def _validate_path_segment(value: str, name: str) -> str:
 class GitHubAPIError(Exception):
     """Error from GitHub API."""
 
-    def __init__(self, message: str, status_code: int = 0, response: Optional[dict] = None):
+    def __init__(self, message: str, status_code: int = 0, response: dict | None = None):
         super().__init__(message)
         self.status_code = status_code
         self.response = response or {}
@@ -47,7 +47,7 @@ class GitHubClient(PlatformClient):
 
     def __init__(
         self,
-        token: Optional[str] = None,
+        token: str | None = None,
         base_url: str = BASE_URL,
         timeout: float = 30.0,
     ):
@@ -74,11 +74,11 @@ class GitHubClient(PlatformClient):
         self,
         method: str,
         path: str,
-        params: Optional[dict] = None,
+        params: dict | None = None,
         retry_count: int = 3,
     ) -> Any:
         """Make an API request with retry logic."""
-        last_error: Optional[Exception] = None
+        last_error: Exception | None = None
 
         for attempt in range(retry_count):
             try:
@@ -116,7 +116,7 @@ class GitHubClient(PlatformClient):
     async def _paginate(
         self,
         path: str,
-        params: Optional[dict] = None,
+        params: dict | None = None,
         limit: int = 100,
     ) -> list[Any]:
         """Paginate through API results."""
@@ -170,8 +170,8 @@ class GitHubClient(PlatformClient):
 
     async def list_repositories(
         self,
-        owner: Optional[str] = None,
-        org: Optional[str] = None,
+        owner: str | None = None,
+        org: str | None = None,
     ) -> list[Repository]:
         """List repositories for a user or organization."""
         if org:
@@ -189,8 +189,8 @@ class GitHubClient(PlatformClient):
     async def get_commits(
         self,
         repository: Repository,
-        since: Optional[datetime] = None,
-        until: Optional[datetime] = None,
+        since: datetime | None = None,
+        until: datetime | None = None,
         limit: int = 100,
     ) -> list[Activity]:
         """Fetch commit activities for a repository."""
@@ -246,7 +246,7 @@ class GitHubClient(PlatformClient):
     async def get_pull_requests(
         self,
         repository: Repository,
-        since: Optional[datetime] = None,
+        since: datetime | None = None,
         state: str = "all",
         limit: int = 100,
     ) -> list[Activity]:
@@ -294,7 +294,7 @@ class GitHubClient(PlatformClient):
     async def get_issues(
         self,
         repository: Repository,
-        since: Optional[datetime] = None,
+        since: datetime | None = None,
         state: str = "all",
         limit: int = 100,
     ) -> list[Activity]:
@@ -340,8 +340,8 @@ class GitHubClient(PlatformClient):
     async def get_activities(
         self,
         repository: Repository,
-        since: Optional[datetime] = None,
-        until: Optional[datetime] = None,
+        since: datetime | None = None,
+        until: datetime | None = None,
         limit: int = 100,
     ) -> list[Activity]:
         """Fetch all activities for a repository."""
@@ -392,7 +392,7 @@ class GitHubClient(PlatformClient):
         self,
         repository: Repository,
         *,
-        since: Optional[datetime] = None,
+        since: datetime | None = None,
         limit: int = 200,
     ) -> list[Any]:
         """Fetch closed pull requests as raw GitHub API dicts."""
