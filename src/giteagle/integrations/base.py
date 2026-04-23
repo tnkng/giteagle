@@ -45,7 +45,7 @@ class PlatformClient(ABC):
         """Close the client and release resources."""
         pass
 
-    async def __aenter__(self) -> "PlatformClient":
+    async def __aenter__(self) -> PlatformClient:
         """Enter async context manager."""
         return self
 

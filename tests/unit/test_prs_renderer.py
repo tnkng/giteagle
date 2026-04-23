@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from io import StringIO
 
 from rich.console import Console
@@ -27,23 +27,23 @@ class TestAgeDisplay:
     """Tests for the age_display function."""
 
     def test_minutes(self) -> None:
-        now = datetime(2026, 2, 9, 12, 0, 0, tzinfo=timezone.utc)
-        created = datetime(2026, 2, 9, 11, 30, 0, tzinfo=timezone.utc)
+        now = datetime(2026, 2, 9, 12, 0, 0, tzinfo=UTC)
+        created = datetime(2026, 2, 9, 11, 30, 0, tzinfo=UTC)
         assert age_display(created, now=now) == "30m"
 
     def test_hours(self) -> None:
-        now = datetime(2026, 2, 9, 14, 0, 0, tzinfo=timezone.utc)
-        created = datetime(2026, 2, 9, 12, 0, 0, tzinfo=timezone.utc)
+        now = datetime(2026, 2, 9, 14, 0, 0, tzinfo=UTC)
+        created = datetime(2026, 2, 9, 12, 0, 0, tzinfo=UTC)
         assert age_display(created, now=now) == "2h"
 
     def test_days(self) -> None:
-        now = datetime(2026, 2, 9, 12, 0, 0, tzinfo=timezone.utc)
-        created = datetime(2026, 2, 6, 12, 0, 0, tzinfo=timezone.utc)
+        now = datetime(2026, 2, 9, 12, 0, 0, tzinfo=UTC)
+        created = datetime(2026, 2, 6, 12, 0, 0, tzinfo=UTC)
         assert age_display(created, now=now) == "3d"
 
     def test_weeks(self) -> None:
-        now = datetime(2026, 2, 9, 12, 0, 0, tzinfo=timezone.utc)
-        created = datetime(2026, 1, 26, 12, 0, 0, tzinfo=timezone.utc)
+        now = datetime(2026, 2, 9, 12, 0, 0, tzinfo=UTC)
+        created = datetime(2026, 1, 26, 12, 0, 0, tzinfo=UTC)
         assert age_display(created, now=now) == "2w"
 
 
@@ -176,7 +176,7 @@ class TestRenderPrs:
             number=42,
             title="Add feature",
             author="alice",
-            created_at=datetime.now(tz=timezone.utc) - timedelta(days=2),
+            created_at=datetime.now(tz=UTC) - timedelta(days=2),
         )
         render_prs(console, [pr])
         output = buf.getvalue()
@@ -191,7 +191,7 @@ class TestRenderPrs:
             number=1,
             title="Old PR",
             author="alice",
-            created_at=datetime.now(tz=timezone.utc) - timedelta(days=14),
+            created_at=datetime.now(tz=UTC) - timedelta(days=14),
         )
         render_prs(console, [old_pr], stale_days=7)
         output = buf.getvalue()
@@ -211,14 +211,14 @@ class TestRenderPrs:
                 number=1,
                 title="Alice PR",
                 author="alice",
-                created_at=datetime.now(tz=timezone.utc) - timedelta(days=1),
+                created_at=datetime.now(tz=UTC) - timedelta(days=1),
             ),
             PullRequestInfo(
                 repo_name="org/repo",
                 number=2,
                 title="Bob PR",
                 author="bob",
-                created_at=datetime.now(tz=timezone.utc) - timedelta(days=1),
+                created_at=datetime.now(tz=UTC) - timedelta(days=1),
             ),
         ]
         render_prs(console, prs, author_filter="alice")
@@ -234,7 +234,7 @@ class TestRenderPrs:
                 number=i,
                 title=f"PR {i}",
                 author="alice",
-                created_at=datetime.now(tz=timezone.utc) - timedelta(days=1),
+                created_at=datetime.now(tz=UTC) - timedelta(days=1),
             )
             for i in range(3)
         ]

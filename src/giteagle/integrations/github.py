@@ -3,7 +3,7 @@
 import asyncio
 import logging
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 import httpx
@@ -89,7 +89,7 @@ class GitHubClient(PlatformClient):
                     remaining = response.headers.get("X-RateLimit-Remaining", "1")
                     if remaining == "0":
                         reset_timestamp = int(response.headers.get("X-RateLimit-Reset", "0"))
-                        reset_at = datetime.fromtimestamp(reset_timestamp, tz=timezone.utc)
+                        reset_at = datetime.fromtimestamp(reset_timestamp, tz=UTC)
                         raise RateLimitError(reset_at)
 
                 if response.status_code == 404:
@@ -222,7 +222,7 @@ class GitHubClient(PlatformClient):
             try:
                 timestamp = datetime.fromisoformat(timestamp_str.replace("Z", "+00:00"))
             except ValueError:
-                timestamp = datetime.now(tz=timezone.utc)
+                timestamp = datetime.now(tz=UTC)
 
             activity = Activity(
                 id=f"github:commit:{commit['sha']}",

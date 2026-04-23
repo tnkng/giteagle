@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from io import StringIO
 
 from rich.console import Console
@@ -140,7 +140,7 @@ class TestComputeRepoStats:
     """Tests for the compute_repo_stats function."""
 
     def test_throughput_calculation(self) -> None:
-        now = datetime(2026, 2, 9, 12, 0, 0, tzinfo=timezone.utc)
+        now = datetime(2026, 2, 9, 12, 0, 0, tzinfo=UTC)
         metrics = [
             PRMetrics(
                 repo_name="org/repo",
@@ -159,7 +159,7 @@ class TestComputeRepoStats:
         assert stats.merged_count == 4
 
     def test_merge_rate(self) -> None:
-        now = datetime(2026, 2, 9, 12, 0, 0, tzinfo=timezone.utc)
+        now = datetime(2026, 2, 9, 12, 0, 0, tzinfo=UTC)
         metrics = [
             PRMetrics(
                 repo_name="org/repo",

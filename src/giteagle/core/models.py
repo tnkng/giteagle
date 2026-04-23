@@ -1,12 +1,12 @@
 """Core data models for Giteagle."""
 
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl
 
 
-class ActivityType(str, Enum):
+class ActivityType(StrEnum):
     """Types of activities that can be tracked."""
 
     COMMIT = "commit"

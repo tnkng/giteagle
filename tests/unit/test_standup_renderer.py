@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from io import StringIO
 
 from rich.console import Console
@@ -64,7 +64,7 @@ def _make_activity(
             url=f"https://github.com/{repo_name}",
         ),
         contributor=Contributor(username=username),
-        timestamp=datetime.now(tz=timezone.utc) - timedelta(hours=hours_ago),
+        timestamp=datetime.now(tz=UTC) - timedelta(hours=hours_ago),
         title=title,
         metadata=default_metadata,
     )
@@ -75,27 +75,27 @@ class TestComputeStandupSince:
 
     def test_weekday_returns_1_day(self) -> None:
         """On a Tuesday, days=1 returns yesterday midnight."""
-        tuesday = datetime(2026, 2, 10, 14, 30, 0, tzinfo=timezone.utc)  # Tuesday
+        tuesday = datetime(2026, 2, 10, 14, 30, 0, tzinfo=UTC)  # Tuesday
         since = compute_standup_since(1, now=tuesday)
-        assert since == datetime(2026, 2, 9, 0, 0, 0, tzinfo=timezone.utc)
+        assert since == datetime(2026, 2, 9, 0, 0, 0, tzinfo=UTC)
 
     def test_monday_skips_weekend(self) -> None:
         """On a Monday, days=1 returns Friday midnight."""
-        monday = datetime(2026, 2, 9, 14, 30, 0, tzinfo=timezone.utc)  # Monday
+        monday = datetime(2026, 2, 9, 14, 30, 0, tzinfo=UTC)  # Monday
         since = compute_standup_since(1, now=monday)
-        assert since == datetime(2026, 2, 6, 0, 0, 0, tzinfo=timezone.utc)
+        assert since == datetime(2026, 2, 6, 0, 0, 0, tzinfo=UTC)
 
     def test_custom_days(self) -> None:
         """days=3 returns 3 days ago regardless of day of week."""
-        wednesday = datetime(2026, 2, 11, 10, 0, 0, tzinfo=timezone.utc)
+        wednesday = datetime(2026, 2, 11, 10, 0, 0, tzinfo=UTC)
         since = compute_standup_since(3, now=wednesday)
-        assert since == datetime(2026, 2, 8, 0, 0, 0, tzinfo=timezone.utc)
+        assert since == datetime(2026, 2, 8, 0, 0, 0, tzinfo=UTC)
 
     def test_monday_with_custom_days_no_skip(self) -> None:
         """On Monday with days=3, does NOT auto-adjust for weekend."""
-        monday = datetime(2026, 2, 9, 14, 30, 0, tzinfo=timezone.utc)
+        monday = datetime(2026, 2, 9, 14, 30, 0, tzinfo=UTC)
         since = compute_standup_since(3, now=monday)
-        assert since == datetime(2026, 2, 6, 0, 0, 0, tzinfo=timezone.utc)
+        assert since == datetime(2026, 2, 6, 0, 0, 0, tzinfo=UTC)
 
 
 class TestBuildStandupData:
@@ -103,7 +103,7 @@ class TestBuildStandupData:
 
     def test_groups_by_repo(self) -> None:
         """Activities from 2 repos produce 2 RepoStandup entries."""
-        since = datetime.now(tz=timezone.utc) - timedelta(hours=2)
+        since = datetime.now(tz=UTC) - timedelta(hours=2)
         activities = [
             _make_activity(repo_name="org/api", title="commit1"),
             _make_activity(repo_name="org/web", title="commit2"),
@@ -115,7 +115,7 @@ class TestBuildStandupData:
 
     def test_separates_commits(self) -> None:
         """Commits go into the commits list."""
-        since = datetime.now(tz=timezone.utc) - timedelta(hours=2)
+        since = datetime.now(tz=UTC) - timedelta(hours=2)
         activities = [
             _make_activity(activity_type=ActivityType.COMMIT, title="fix bug"),
         ]
@@ -126,7 +126,7 @@ class TestBuildStandupData:
 
     def test_separates_pr_opened(self) -> None:
         """PRs created within the window go into prs_opened."""
-        since = datetime.now(tz=timezone.utc) - timedelta(hours=2)
+        since = datetime.now(tz=UTC) - timedelta(hours=2)
         activities = [
             _make_activity(
                 activity_type=ActivityType.PULL_REQUEST,
@@ -138,8 +138,8 @@ class TestBuildStandupData:
 
     def test_separates_pr_merged(self) -> None:
         """PRs merged within the window go into prs_merged."""
-        since = datetime.now(tz=timezone.utc) - timedelta(hours=2)
-        merged_at = (datetime.now(tz=timezone.utc) - timedelta(hours=1)).isoformat()
+        since = datetime.now(tz=UTC) - timedelta(hours=2)
+        merged_at = (datetime.now(tz=UTC) - timedelta(hours=1)).isoformat()
         activities = [
             _make_activity(
                 activity_type=ActivityType.PULL_REQUEST,
@@ -155,8 +155,8 @@ class TestBuildStandupData:
 
     def test_separates_issue_closed(self) -> None:
         """Issues closed within the window go into issues_closed."""
-        since = datetime.now(tz=timezone.utc) - timedelta(hours=2)
-        closed_at = (datetime.now(tz=timezone.utc) - timedelta(hours=1)).isoformat()
+        since = datetime.now(tz=UTC) - timedelta(hours=2)
+        closed_at = (datetime.now(tz=UTC) - timedelta(hours=1)).isoformat()
         activities = [
             _make_activity(
                 activity_type=ActivityType.ISSUE,
@@ -171,13 +171,13 @@ class TestBuildStandupData:
 
     def test_empty_activities(self) -> None:
         """Empty activities list returns empty result."""
-        since = datetime.now(tz=timezone.utc) - timedelta(hours=2)
+        since = datetime.now(tz=UTC) - timedelta(hours=2)
         result = build_standup_data([], since)
         assert result == []
 
     def test_filters_old_activities(self) -> None:
         """Activities before the since window are excluded."""
-        since = datetime.now(tz=timezone.utc) - timedelta(hours=2)
+        since = datetime.now(tz=UTC) - timedelta(hours=2)
         activities = [
             _make_activity(title="old commit", hours_ago=48),
         ]
@@ -204,7 +204,7 @@ class TestRenderStandup:
     def test_renders_repo_name(self) -> None:
         """Output contains the repository name."""
         console, buf = _make_console()
-        since = datetime.now(tz=timezone.utc) - timedelta(hours=2)
+        since = datetime.now(tz=UTC) - timedelta(hours=2)
         data = [
             RepoStandup(
                 repo_name="org/api",
@@ -218,7 +218,7 @@ class TestRenderStandup:
     def test_renders_commit_count(self) -> None:
         """Output contains commit count."""
         console, buf = _make_console()
-        since = datetime.now(tz=timezone.utc) - timedelta(hours=2)
+        since = datetime.now(tz=UTC) - timedelta(hours=2)
         data = [
             RepoStandup(
                 repo_name="org/api",
@@ -232,7 +232,7 @@ class TestRenderStandup:
     def test_renders_author(self) -> None:
         """Output contains the author name when provided."""
         console, buf = _make_console()
-        since = datetime.now(tz=timezone.utc) - timedelta(hours=2)
+        since = datetime.now(tz=UTC) - timedelta(hours=2)
         data = [
             RepoStandup(
                 repo_name="org/api",
@@ -246,7 +246,7 @@ class TestRenderStandup:
     def test_empty_data_message(self) -> None:
         """Shows 'No activity' message when no data."""
         console, buf = _make_console()
-        since = datetime.now(tz=timezone.utc) - timedelta(hours=2)
+        since = datetime.now(tz=UTC) - timedelta(hours=2)
         render_standup(console, [], since=since)
         output = buf.getvalue()
         assert "No activity" in output
@@ -254,7 +254,7 @@ class TestRenderStandup:
     def test_renders_total_footer(self) -> None:
         """Output contains total activity count."""
         console, buf = _make_console()
-        since = datetime.now(tz=timezone.utc) - timedelta(hours=2)
+        since = datetime.now(tz=UTC) - timedelta(hours=2)
         data = [
             RepoStandup(
                 repo_name="org/api",

@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import asyncio
 from collections.abc import Coroutine
-from datetime import datetime, timedelta, timezone
-from typing import Any, TypeVar
+from datetime import UTC, datetime, timedelta
+from typing import Any
 
 import click
 from rich import box
@@ -24,10 +24,8 @@ from giteagle.integrations import GitHubClient
 
 console = Console()
 
-T = TypeVar("T")
 
-
-def run_async(coro: Coroutine[Any, Any, T]) -> T:
+def run_async[T](coro: Coroutine[Any, Any, T]) -> T:
     """Run an async function in the event loop."""
     return asyncio.run(coro)
 
@@ -107,7 +105,7 @@ def activity(ctx: click.Context, repo: str, days: int, limit: int) -> None:
         raise SystemExit(1)
 
     owner, name = repo.split("/", 1)
-    since = datetime.now(tz=timezone.utc) - timedelta(days=days)
+    since = datetime.now(tz=UTC) - timedelta(days=days)
 
     async def fetch_activity() -> tuple:
         async with GitHubClient(token=token) as client:
@@ -165,7 +163,7 @@ def summary(ctx: click.Context, repos: tuple, days: int) -> None:
     """
     config = ctx.obj["config"]
     token = config.github.token.get_secret_value() if config.github.token else None
-    since = datetime.now(tz=timezone.utc) - timedelta(days=days)
+    since = datetime.now(tz=UTC) - timedelta(days=days)
 
     async def fetch_all() -> ActivityAggregator:
         async with GitHubClient(token=token) as client:
@@ -254,7 +252,7 @@ def timeline(ctx: click.Context, repos: tuple, days: int, granularity: str) -> N
     """Show activity timeline across repositories."""
     config = ctx.obj["config"]
     token = config.github.token.get_secret_value() if config.github.token else None
-    since = datetime.now(tz=timezone.utc) - timedelta(days=days)
+    since = datetime.now(tz=UTC) - timedelta(days=days)
 
     async def fetch_all() -> ActivityAggregator:
         async with GitHubClient(token=token) as client:
@@ -339,7 +337,7 @@ def log_cmd(ctx: click.Context, repos: tuple, days: int, limit: int, author: str
     """
     config_obj = ctx.obj["config"]
     token = config_obj.github.token.get_secret_value() if config_obj.github.token else None
-    since = datetime.now(tz=timezone.utc) - timedelta(days=days)
+    since = datetime.now(tz=UTC) - timedelta(days=days)
 
     async def fetch_commits() -> list:
         async with GitHubClient(token=token) as client:
@@ -533,7 +531,7 @@ def stats(ctx: click.Context, repos: tuple, days: int) -> None:
     """
     config_obj = ctx.obj["config"]
     token = config_obj.github.token.get_secret_value() if config_obj.github.token else None
-    now = datetime.now(tz=timezone.utc)
+    now = datetime.now(tz=UTC)
     current_since = now - timedelta(days=days)
     prev_since = current_since - timedelta(days=days)
 

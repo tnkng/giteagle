@@ -4,7 +4,7 @@
 
 - **Repo**: `igormilovanovic/giteagle`
 - **Default branch**: `master`
-- **Language**: Python (3.10+)
+- **Language**: Python 3.14
 - **Package manager**: `uv`
 
 ## GitHub Workflow Rules
@@ -41,7 +41,7 @@ After every push, you MUST verify the code is correct by monitoring CI:
 - If any check fails, run `gh run view --log-failed` to inspect the failure logs.
 - Diagnose and fix the failure locally, then push again.
 - Repeat until all checks pass — do not merge with failing checks.
-- Do NOT rely solely on local test runs. GH Actions is the source of truth for correctness (it tests across Python 3.10-3.13).
+- Do NOT rely solely on local test runs. GH Actions is the source of truth for correctness (it tests on Python 3.14).
 
 **Verification loop after pushing:**
 
@@ -51,7 +51,7 @@ gh run list -b <branch> -L 1  # Find the latest run
 gh run view <run-id> --log-failed  # Inspect failures if any
 ```
 
-- All PRs must pass the full CI workflow (lint, type-check, tests on Python 3.10-3.13) before merging.
+- All PRs must pass the full CI workflow (lint, type-check, tests on Python 3.14) before merging.
 - Never bypass or skip checks. Never use `--no-verify`.
 
 ### 5. Merging
@@ -237,7 +237,7 @@ uv run pytest --cov           # Test with coverage
 ## CI/CD
 
 - Lint + type-check in a **separate job** from tests (fail fast on style issues).
-- Matrix test across **all** supported Python versions (3.10, 3.11, 3.12, 3.13).
+- Test on the currently supported Python version (3.14). Re-introduce a matrix only when the project targets multiple versions.
 - Enforce coverage thresholds with `--cov-fail-under`.
 - Use `uv sync --frozen` in CI for reproducible builds.
 - Add security scanning (bandit, pip-audit) as a CI job.

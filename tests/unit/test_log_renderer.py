@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from io import StringIO
 
 from rich.console import Console
@@ -42,7 +42,7 @@ def _make_activity(
             url=f"https://github.com/{repo_name}",
         ),
         contributor=Contributor(username="testuser"),
-        timestamp=datetime.now(tz=timezone.utc) - timedelta(hours=hours_ago),
+        timestamp=datetime.now(tz=UTC) - timedelta(hours=hours_ago),
         title=title,
         metadata={
             "sha": sha,
