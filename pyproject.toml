@@ -68,6 +68,7 @@ dev = [
     "mypy>=1.0.0",
     "types-PyYAML>=6.0.0",
     "pip-audit>=2.0",
+    "bandit>=1.9.4",
 ]
 
 [tool.pytest.ini_options]
@@ -110,3 +111,7 @@ python_version = "3.14"
 warn_return_any = true
 warn_unused_ignores = true
 disallow_untyped_defs = true
+
+[tool.bandit]
+targets = ["src"]
+severity = "medium"

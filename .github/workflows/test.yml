@@ -80,3 +80,6 @@ jobs:
 
       - name: Run pip-audit
         run: uv run pip-audit
+
+      - name: Run bandit
+        run: uv run bandit -r src/ -c pyproject.toml
