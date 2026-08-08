@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 from collections.abc import Coroutine
 from datetime import UTC, datetime, timedelta
 from typing import Any
@@ -22,6 +23,7 @@ from giteagle.config import load_config
 from giteagle.core import ActivityAggregator, ActivityType
 from giteagle.integrations import GitHubClient
 
+logger = logging.getLogger(__name__)
 console = Console()
 
 
@@ -268,7 +270,7 @@ def timeline(ctx: click.Context, repos: tuple, days: int, granularity: str) -> N
                     activities = await client.get_activities(repository, since=since, limit=500)
                     aggregator.add_activities(activities)
                 except Exception:
-                    pass
+                    logger.warning("Failed to fetch activities for %s", repo_name, exc_info=True)
 
             return aggregator
 
@@ -400,7 +402,10 @@ def standup(ctx: click.Context, repos: tuple, days: int, author: str | None) -> 
                 try:
                     resolved_author = await client.get_authenticated_user()
                 except Exception:
-                    pass
+                    logger.warning(
+                        "Could not resolve authenticated user; author filter disabled",
+                        exc_info=True,
+                    )
 
             all_activities: list = []
             for repo_name in repos:
